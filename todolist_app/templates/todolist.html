@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}
+	<title>Toto List Manager - TaskMate</title>
+{% endblock title %}
+
+
+{% block content %}
+	<div class="container">
+		<br/>
+		{% include "alert.html" %}
+		{% include "form_errors.html" with form=form %}
+		<form method="post" class="row gx-3 gy-2 align-items-center">
+			{% csrf_token %}
+			<div class="col-12">
+				<input type="text" class="form-control" name="task" placeholder="Enter task details">
+			</div>
+			<div class="col-auto">
+				<button type="submit" class="btn btn-primary">Add Task</button>
+			</div>
+		</form>
+		<br/>
+
+		<table class="table table-bordered">
+			<thead class="table-dark">
+				<tr>
+					<th class="col-7">Task</th>
+					<th class="col-3">Done</th>
+					<th class="col-1">Edit</th>
+					<th class="col-1">Delete</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if tasks_all %}
+					{% for obj in tasks_all %}
+						<tr {% if obj.done %} class="table-success" {% endif %}>
+							<td class="col-7">
+								{% if obj.done %}
+									<del>{{ obj.task }}</del>
+								{% else %}
+									{{ obj.task }}
+								{% endif %}
+							</td>
+							<td class="col-3">
+								{% if obj.done %}
+									<a href="{% url "pending_task" obj.id %}">
+										<button type="button" class="btn btn-dark">Mark as pending</button>
+									</a>
+								{% else %}
+									<a href="{% url "complete_task" obj.id %}">
+										<button type="button" class="btn btn-dark">Mark as completed</button>
+									</a>
+								{% endif %}
+							</td>
+							<td class="col-1">
+								<a href="{% url "edit_task" obj.id %}">
+									<button type="button" class="btn btn-warning">Edit</button>
+								</a>
+							</td>
+							<td class="col-1">
+								<a href="{% url "delete_task" obj.id %}">
+									<button type="button" class="btn btn-danger">Delete</button>
+								</a>
+							</td>
+						</tr>
+					{% endfor %}
+				{% endif  %}
+			</tbody>
+		</table>
+		<nav aria-label="...">
+			<ul class="pagination">
+
+				<li class="page-item">
+					<a class="page-link" href="?page=1" tabindex="-1">Previous</a>
+				</li>
+				{% if tasks_all.has_previous %}
+				<li class="page-item">
+					<a class="page-link"href="?page={{tasks_all.previous_page_number}}">{{tasks_all.previous_page_number}}</a>
+				</li>
+				{% endif %}
+				<li class="page-itemactive">
+					<a class="page-link"href="?page={{tasks_all.number}}">{{tasks_all.number}}</a>
+				</li>
+				{% if tasks_all.has_next %}
+				<li class="page-item">
+					<a class="page-link" href="?page={{tasks_all.next_page_number}}">{{tasks_all.next_page_number}}</a>
+				</li>
+				{% endif %}
+				<li class="page-item">
+					<a class="page-link"href="?page={{tasks_all.paginator.num_pages}}">Next</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+{% endblock content %}
